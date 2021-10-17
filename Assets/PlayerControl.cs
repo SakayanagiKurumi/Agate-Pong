@@ -4,126 +4,88 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    // Start is called before the first frame update
-    // Tombol untuk menggerakkan ke atas
     public KeyCode upButton = KeyCode.W;
-
-    // Tombol untuk menggerakkan ke bawah
     public KeyCode downButton = KeyCode.S;
 
-    // Kecepatan gerak
     public float speed = 10.0f;
-
-    // Batas atas dan bawah game scene (Batas bawah menggunakan minus (-))
     public float yBoundary = 9.0f;
 
-    // Rigidbody 2D raket ini
     private Rigidbody2D rigidBody2D;
 
-    // Skor pemain
     private int score;
 
-    // Menaikkan skor sebanyak 1 poin
+    //==========For debug==========
+    private ContactPoint2D lastContactPoint;
+
+    // Start is called before the first frame update
+    private void Start()
+    {
+        rigidBody2D = GetComponent<Rigidbody2D>();
+    }
+
+    // Update is called once per frame
+    private void Update()
+    {
+        Vector2 velocity = rigidBody2D.velocity;
+
+        if (Input.GetKey(upButton))
+        {
+            velocity.y = speed;
+        }
+        else if (Input.GetKey(downButton))
+        {
+            velocity.y = -speed;
+        }
+        else
+        {
+            velocity.y = 0.0f;
+        }
+
+        rigidBody2D.velocity = velocity;
+
+        //Limiting racket position
+        Vector3 position = transform.position;
+
+        if (position.y > yBoundary)
+        {
+            position.y = yBoundary;
+        }
+        else if (position.y < -yBoundary)
+        {
+            position.y = -yBoundary;
+        }
+
+        transform.position = position;
+    }
+
     public void IncrementScore()
     {
         score++;
     }
 
-    // Mengembalikan skor menjadi 0
     public void ResetScore()
     {
         score = 0;
     }
 
-    // Mendapatkan nilai skor
     public int Score
     {
         get { return score; }
     }
 
-    // Titik tumbukan terakhir dengan bola, untuk menampilkan variabel-variabel fisika terkait tumbukan tersebut
-    private ContactPoint2D lastContactPoint;
-
-    // Untuk mengakses informasi titik kontak dari kelas lain
+    //==========For debug==========
     public ContactPoint2D LastContactPoint
     {
         get { return lastContactPoint; }
     }
 
-    // Ketika terjadi tumbukan dengan bola, rekam titik kontaknya.
-    void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.name.Equals("Ball"))
         {
             lastContactPoint = collision.GetContact(0);
         }
     }
-
-    // Titik asal lintasan bola saat ini
-    private Vector2 trajectoryOrigin;
-
-    // Ketika bola beranjak dari sebuah tumbukan, rekam titik tumbukan tersebut
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        trajectoryOrigin = transform.position;
-    }
-    // Untuk mengakses informasi titik asal lintasan
-    public Vector2 TrajectoryOrigin
-    {
-        get { return trajectoryOrigin; }
-    }
-    void Start()
-    {
-        rigidBody2D = GetComponent<Rigidbody2D>();
-        trajectoryOrigin = transform.position;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // Dapatkan kecepatan raket sekarang.
-        Vector2 velocity = rigidBody2D.velocity;
-
-        // Jika pemain menekan tombol ke atas, beri kecepatan positif ke komponen y (ke atas).
-        if (Input.GetKey(upButton))
-        {
-            velocity.y = speed;
-        }
-
-        // Jika pemain menekan tombol ke bawah, beri kecepatan negatif ke komponen y (ke bawah).
-        else if (Input.GetKey(downButton))
-        {
-            velocity.y = -speed;
-        }
-
-        // Jika pemain tidak menekan tombol apa-apa, kecepatannya nol.
-        else
-        {
-            velocity.y = 0.0f;
-        }
-
-        // Masukkan kembali kecepatannya ke rigidBody2D.
-        rigidBody2D.velocity = velocity;
-
-        // Dapatkan posisi raket sekarang.
-        Vector3 position = transform.position;
-
-        // Jika posisi raket melewati batas atas (yBoundary), kembalikan ke batas atas tersebut.
-        if (position.y > yBoundary)
-        {
-            position.y = yBoundary;
-        }
-
-        // Jika posisi raket melewati batas bawah (-yBoundary), kembalikan ke batas atas tersebut.
-        else if (position.y < -yBoundary)
-        {
-            position.y = -yBoundary;
-        }
-
-        // Masukkan kembali posisinya ke transform.
-        transform.position = position;
-
-
-
-    }
 }
+
+
